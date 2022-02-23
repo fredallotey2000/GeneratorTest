@@ -19,6 +19,13 @@ class PlantControllerIntegrationTest {
 
     @Autowired
     TestRestTemplate testRestTemplate;
+    
+      @Test
+    public void testUserAuthFailure() throws Exception {
+        ResponseEntity<Plant> response = testRestTemplate.withBasicAuth("someuser", "somepassword").
+                getForEntity("/api/plants/5", Plant.class);
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.UNAUTHORIZED);
+    }
 
     @Test
     public void testGetPlantSuccess() throws Exception {
