@@ -7,11 +7,8 @@ package com.generatortest.generatortest.controller;
 import com.generatortest.generatortest.data.Plant;
 import com.generatortest.generatortest.service.PlantService;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,11 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlantController {
 
     private final PlantService plantService;
-    private final PlantModelAssembler assembler;
 
-    public PlantController(PlantService plantService, PlantModelAssembler assembler) {
+    public PlantController(PlantService plantService) {
         this.plantService = plantService;
-        this.assembler = assembler;
     }
 
     @RequestMapping(value = "/plants", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -65,7 +60,7 @@ public class PlantController {
             return ResponseEntity.ok().body(plant.get());
         } catch (InterruptedException | ExecutionException ex) {
             if (ex.getMessage().contains("No value present")) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not find plant with ID " + plantId);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Could not find plant with ID " + plantId);
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }

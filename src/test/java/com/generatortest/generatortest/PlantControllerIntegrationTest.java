@@ -1,8 +1,6 @@
 package com.generatortest.generatortest;
 
-import com.fasterxml.classmate.GenericType;
 import com.generatortest.generatortest.data.Plant;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +31,7 @@ class PlantControllerIntegrationTest {
     public void testGetPlantFail() {
         ResponseEntity<String> response = testRestTemplate.withBasicAuth("gentest", "genTest123$").
                 getForEntity("/api/plants/-5", String.class);
-        Assertions.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.NOT_FOUND);
     }
 
     @Test
