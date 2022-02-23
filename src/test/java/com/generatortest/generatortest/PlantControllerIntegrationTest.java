@@ -1,11 +1,14 @@
 package com.generatortest.generatortest;
 
-import com.generatortest.generatortest.controller.PlantController;
+import com.fasterxml.classmate.GenericType;
+import com.generatortest.generatortest.data.Plant;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -17,90 +20,66 @@ import org.springframework.test.context.junit4.SpringRunner;
 class PlantControllerIntegrationTest {
 
     @Autowired
-    PlantController plantController;
+    TestRestTemplate testRestTemplate;
 
     @Test
     public void testGetPlantSuccess() throws Exception {
-//        ResponseEntity plant = plantController.getPlant(5L);
-//        Assertions.assertEquals(plant.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+        ResponseEntity<Plant> response = testRestTemplate.withBasicAuth("gentest", "genTest123$").
+                getForEntity("/api/plants/5", Plant.class);
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
     }
 
     @Test
     public void testGetPlantFail() {
-//        ResponseEntity plant = plantController.getPlant(-4L);
-//        assertEquals(plant.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+        ResponseEntity<String> response = testRestTemplate.withBasicAuth("gentest", "genTest123$").
+                getForEntity("/api/plants/-5", String.class);
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
     public void testGetPlantByLocationSuccess() {
-//
-////        mvc.perform(get("/posts/1/comments")).andExpect(jsonPath("$").isArray())
-////                .andExpect(jsonPath("$.[0].postId", is(1))).andExpect(jsonPath("$.[0].message", is("test comment1")))
-////                .andDo(print());
-//        ResponseEntity plant = null;
-//        try {
-//            plant = plantController.getPlants("AK", null, null, null, 0, 3);
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(PlantControllerIntegrationTest.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        // assertNotNull(plant.get);
-//        assertNotNull(plant.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR);
+        ResponseEntity<Plant[]> response = testRestTemplate.withBasicAuth("gentest", "genTest123$").
+                getForEntity("/api/plants?location=AK&page=0&size=3", Plant[].class);
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
     }
 
     @Test
     public void testGetPlantByLocationFail() {
-//        ResponseEntity plant = null;
-//        try {
-//            plant = plantController.getPlants("AK", null, null, null, 0, -3);
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(PlantControllerIntegrationTest.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        assertNotNull(plant.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR);
+        ResponseEntity<String> response = testRestTemplate.withBasicAuth("gentest", "genTest123$").
+                getForEntity("/api/plants?location=AK&page=-2&size=3", String.class);
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
-    public void testGetTopPlantsSuccess() {
-//        ResponseEntity plant = null;
-//        try {
-//            plant = plantController.getPlants(null, 5, null, "asc", null, null);
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(PlantControllerIntegrationTest.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        assertNotNull(plant);
-//        assertNotNull(plant.getStatusCode() == HttpStatus.OK);
+    public void testGetTopPlantsSuccessAsc() {
+        ResponseEntity<Plant[]> response = testRestTemplate.withBasicAuth("gentest", "genTest123$").
+                getForEntity("/api/plants?top=5&sort=asc", Plant[].class);
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
+        Assertions.assertEquals(response.getBody().length, 5);
+    }
+    
+       @Test
+    public void testGetTopPlantsSuccessDesc() {
+        ResponseEntity<Plant[]> response = testRestTemplate.withBasicAuth("gentest", "genTest123$").
+                getForEntity("/api/plants?top=5&sort=desc", Plant[].class);
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
+        Assertions.assertEquals(response.getBody().length, 5);
     }
 
     @Test
-    public void testGetTopPlantsFail() {
-//        ResponseEntity plant = null;
-//        try {
-//            plant = plantController.getPlants(null, -5, null, "asc", null, null);
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(PlantControllerIntegrationTest.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        assertNotNull(plant.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR);
+    public void testGetBottomPlantsSuccesAsc() {
+       ResponseEntity<Plant[]> response = testRestTemplate.withBasicAuth("gentest", "genTest123$").
+                getForEntity("/api/plants?bottom=5&sort=asc", Plant[].class);
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
+        Assertions.assertEquals(response.getBody().length, 5);
+    }
+    
+     @Test
+    public void testGetBottomPlantsSuccesDesc() {
+       ResponseEntity<Plant[]> response = testRestTemplate.withBasicAuth("gentest", "genTest123$").
+                getForEntity("/api/plants?bottom=5&sort=desc", Plant[].class);
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
+        Assertions.assertEquals(response.getBody().length, 5);
     }
 
-    @Test
-    public void testGetBottomPlantsSuccess() {
-//        ResponseEntity plant = null;
-//        try {
-//            plant = plantController.getPlants(null, null, 5, "desc", null, null);
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(PlantControllerIntegrationTest.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        assertNotNull(plant);
-//        assertNotNull(plant.getStatusCode() == HttpStatus.OK);
-    }
-
-    @Test
-    public void testGetBottomPlantsFail() {
-//        ResponseEntity plant = null;
-//        try {
-//            plant = plantController.getPlants(null, -5, null, "asc", null, null);
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(PlantControllerIntegrationTest.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        assertNotNull(plant.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }

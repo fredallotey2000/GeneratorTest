@@ -7,8 +7,11 @@ package com.generatortest.generatortest.controller;
 import com.generatortest.generatortest.data.Plant;
 import com.generatortest.generatortest.service.PlantService;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,9 +53,8 @@ public class PlantController {
         try {
             return ResponseEntity.ok().body(plants.get());
         } catch (ExecutionException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Zero records retrieved");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
-
     }
 
     @RequestMapping(value = "/plants/{plantId}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -62,7 +64,10 @@ public class PlantController {
         try {
             return ResponseEntity.ok().body(plant.get());
         } catch (InterruptedException | ExecutionException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not find plant with id " + plantId);
+            if (ex.getMessage().contains("No value present")) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not find plant with ID " + plantId);
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
 
     }
